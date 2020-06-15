@@ -1,87 +1,64 @@
 <html ng-app="listaTelefonica">
 <head>
 	<meta charset="UTF-8">
-	<title>Lista Telefonica</title>
+	<title>Lista Telefonica em AngularJS</title>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.css">
-	<style>
-		.jumbotron{
-			width: 500px;		
-			text-align: center;
-			margin: 20px auto;
-		}
-		.table{
-			margin-top: 20px;
-		}
-		.form-control{
-			margin-bottom: 5px;
-		}
-		.selecionado {
-			background-color: yellow;
-		}
-		.negrito {
-			font-weight: bold;
-		}
-	</style>
+	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/ui.css">
 	<script src="angular/angular.min.js"></script>
+	<script src="angular/angular-locale_pt-br.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-messages/1.7.9/angular-messages.js"></script>
-	<script>
-		angular.module("listaTelefonica", ["ngMessages"]);
-		angular.module('listaTelefonica').controller("listaTelefonicaCtrl",function($scope){
-			$scope.app = "Lista Telefonica";
-			$scope.contatos = [
-				{nome: "Guilherme", telefone:"9120391283", cor:'yellow'},
-				{nome: "Ana", telefone:"9120391283", cor:'blue'},
-				{nome: "Maria", telefone:"1212312", cor:'red'},
-			];
-			$scope.operadoras = [
-				{nome: "Oi", codigo: 14, categoria: "Celular"},
-				{nome: "Vivo", codigo: 15,categoria: "Celular"},
-				{nome: "Tim", codigo: 41,categoria: "Celular"},
-				{nome: "GTV", codigo: 15,categoria: "Fixo"},
-				{nome: "Net", codigo: 41,categoria: "Fixo"},
-			];
-			$scope.adicionarContato = function(contato){
-				$scope.contatos.push(angular.copy(contato));
-				delete $scope.contato;
-				$scope.contatoForm.$setPristine();
-			}
-
-			$scope.apagarContatos = function(contatos){
-				$scope.contatos = contatos.filter(function(contato){
-					if(!contato.selecionado) return contato;
-				});
-				
-			}
-
-			$scope.isContatoSelecionado = function(contatos){
-				return contatos.some(function(contato){
-					return contato.selecionado;
-				});
-			}
-
-			$scope.classe1 = "selecionado";
-			$scope.classe2 = "negrito";
-			
-		});
-	</script>
+	<script src="js/app.js"></script>
+	<script src="js/controllers/listaTelefonicaController.js"></script>
+	<script src="js/services/contatosAPIService.js"></script>
+	<script src="js/services/operadorasAPIService.js"></script>
+	<script src="js/services/serialGeneratorService.js"></script>
+	<script src="js/value/configValue.js"></script>
+	<script src="js/config/serialGeneratorConfig.js"></script>
+	<script src="js/filters/nameFilter.js"></script>
+	<script src="js/filters/ellipsesFilter.js"></script>
+	<script src="js/directives/uiAlertDirective.js"></script>
+	<script src="js/directives/uiDateDirective.js"></script>
+	<script src="js/directives//uiAccordionDirective.js"></script>
 </head>
 <body ng-controller="listaTelefonicaCtrl">
 	<div class="jumbotron">
 		<h3>{{app}}</h3>
+
+		<!-- <ui-alert title="Ops, aconteceu um problema">
+			{{message}}
+		</ui-alert> -->
+
+		<ui-accordions>
+			<ui-accordion title="Accordion 1">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi blandit, metus vitae varius accumsan, metus urna fermentum velit, ultrices dictum purus lacus ac neque. Nam egestas at eros ut consequat. Cras bibendum eros a luctus sollicitudin. Etiam neque elit, ultricies ut commodo quis, tempus nec massa. Nunc sodales vestibulum nulla, a aliquet nibh. 
+			</ui-accordion>
+	
+			<ui-accordion title="Accordion 2">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi blandit, metus vitae varius accumsan, metus urna fermentum velit, ultrices dictum purus lacus ac neque. Nam egestas at eros ut consequat. Cras bibendum eros a luctus sollicitudin. Etiam neque elit, ultricies ut commodo quis, tempus nec massa. Nunc sodales vestibulum nulla, a aliquet nibh. 
+			</ui-accordion>
+			
+		</ui-accordions>
+		
+		<hr>
+
+		<input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que vamos buscar?">
 		<table class="table" ng-show="contatos.length">
 			<tr>
 				<th></th>
-				<th>Nome</th>
-				<th>Telefone</th>
+				<th><a href="" ng-click="ordernarPor('serial')">Serial</a></th>
+				<th><a href="" ng-click="ordernarPor('nome')">Nome</a></th>
+				<th><a href="" ng-click="ordernarPor('nome')">Telefone</a></th>
 				<th>Operadora</th>
-				<th></th>
+				<th>Data</th>
 			</tr>
-			<tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos">
+			<tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos  | filter:{ nome: criterioDeBusca} | orderBy:criterioDeOrdenacao :direcaoDaOrdenacao ">
 				<td><input type="checkbox" ng-model="contato.selecionado"></td>
-				<td>{{contato.nome}}</td>
-				<td>{{contato.telefone}}</td>
-				<td>{{contato.operadora.nome}}</td>
-				<td><div style="width: 20px; height: 20px;" ng-style="{'background-color': contato.cor}"></div></td>
+				<td>{{ contato.serial }}</td>
+				<td>{{ contato.nome | name | ellipsis:10}}</td>
+				<td>{{ contato.telefone}}</td>
+				<td>{{ contato.operadora.nome | lowercase}}</td>
+				<td>{{ contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
 			</tr>
 		</table>
 		<hr>
@@ -105,15 +82,24 @@
 				ng-required="true"
 				ng-pattern="/^\d{4,5}-\d{4}$/">
 
+			<input
+				class="form-control"
+				type="text"
+				ng-model="contato.data"
+				name="data"
+				placeholder="Data"
+				ui-date/>
+
+
 			<select 
 				class="form-control" 
 				ng-model="contato.operadora" 
-				ng-options="operadora.nome for operadora in operadoras">
+				ng-options="operadora.nome + ' ('+ (operadora.preco | currency) +') ' for operadora in operadoras | orderBy:'nome'">
 				<option value="">Selecione uma operadora</option>
 			</select>
 		</form>
 
-		<div ng-messages="contatoForm.nome.$error" class="alert alert-danger">
+		<div ng-show="contatoForm.nome.$dirty" ng-messages="contatoForm.nome.$error" class="alert alert-danger">
 			<div ng-message="minlength" >
 				O Campo nome deve ter 10 caracteres
 			</div>
