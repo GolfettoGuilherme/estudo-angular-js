@@ -1,23 +1,19 @@
-angular.module('listaTelefonica').controller("listaTelefonicaCtrl",function($scope, contatosAPI, operadorasAPI, serialGenerator){
+angular.module('listaTelefonica').controller("listaTelefonicaCtrl",function($scope, contatosAPI,contatos, operadoras, serialGenerator){
     $scope.app = "Lista Telefonica";
-    $scope.contatos = [];
-    $scope.operadoras = [];
-    
+    $scope.contatos = contatos.data;
+    $scope.operadoras = operadoras.data;
 
-    var carregarContatos = function() {
-        contatosAPI.getContatos().then(function (data,status) {
-            $scope.contatos = data.data;
-        }).catch(function(data){
-            $scope.message = "tivemos um problema";
+    var init = function(){
+        calcularImpostos($scope.contatos);
+    }
+
+    var calcularImpostos = function(contatos){
+        contatos.forEach(function(contato){
+            contato.operadora.precoComImposto = calcularPreco(contato.operadora.preco);
         });
     }
-
-    var carregarOperadoras = function(){
-        operadorasAPI.getOperadoras().then(function(data){
-            $scope.operadoras = data.data;
-        })
-    }
-
+    
+    
     $scope.adicionarContato = function(contato){
         contato.id = serialGenerator.generateId()
         contato.serial = serialGenerator.generate();
@@ -43,8 +39,8 @@ angular.module('listaTelefonica').controller("listaTelefonicaCtrl",function($sco
         carregarContatos();
     }
 
-    $scope.isContatoSelecionado = function(contatos){
-        return contatos.some(function(contato){
+    $scope.verificarContatoSelecionado = function(contatos){
+        $scope.hasContatoSelecionado =  contatos.some(function(contato){
             return contato.selecionado;
         });
     }
@@ -54,10 +50,14 @@ angular.module('listaTelefonica').controller("listaTelefonicaCtrl",function($sco
         $scope.direcaoDaOrdenacao = !$scope.direcaoDaOrdenacao;
     }
 
+    var calcularPreco = function(preco){
+        var imposto = 1.2;
+        return preco * imposto;
+    }
+
     $scope.classe1 = "selecionado";
     $scope.classe2 = "negrito";
 
-    carregarContatos();
-    carregarOperadoras();
+    init();
     
 });

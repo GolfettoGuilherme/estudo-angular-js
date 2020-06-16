@@ -12,10 +12,15 @@ angular.module('listaTelefonica').factory("contatosAPI", function($http, config)
         return $http.delete(config.baseUrl + "/contatos/"+ contato.id);
     };
 
+    var _getContato = function(id){
+        return $http.get(config.baseUrl + "/contatos/" + id);
+    }
+
     return {
         getContatos : _getContatos,
         saveContato : _saveContato,
-        deleteContato : _deleteContato
+        deleteContato : _deleteContato,
+        getContato : _getContato
     };
 
 })

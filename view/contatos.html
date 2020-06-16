@@ -1,0 +1,31 @@
+<div class="jumbotron">
+    <h3>{{app}}</h3>
+
+    <hr>
+
+    <input class="form-control" type="text" ng-model="criterioDeBusca" ng-model-options="{updateOn: 'default blur',debounce: {default:500, blur: 0 }}" placeholder="O que vamos buscar?">
+    <table class="table" ng-show="contatos.length">
+        <tr>
+            <th></th>
+            <th><a href="" ng-click="ordernarPor('serial')">Serial</a></th>
+            <th><a href="" ng-click="ordernarPor('nome')">Nome</a></th>
+            <th><a href="" ng-click="ordernarPor('nome')">Telefone</a></th>
+            <th>Preço</th>
+            <th>Operadora</th>
+            <th>Data</th>
+        </tr>
+        <tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos | filter:{ nome: criterioDeBusca} | orderBy:criterioDeOrdenacao :direcaoDaOrdenacao track by contato.id">
+            <td><input type="checkbox" ng-model="contato.selecionado" ng-click="verificarContatoSelecionado(contatos)"></td>
+            <td>{{ ::contato.serial }}</td>
+            <td><a href="#detalhesContato/{{contato.id}}">{{ ::contato.nome | name}}</a></td>
+            <td>{{ ::contato.telefone}}</td>
+            <td>{{ ::contato.operadora.precoComImposto | currency}}</td>
+            <td>{{ ::contato.operadora.nome | lowercase}}</td>
+            <td>{{ ::contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
+        </tr>
+    </table>
+    <hr/>
+    
+    <a class="btn btn-primary btn-block" href="#novoContato">Novo Contato</a>
+    
+</div>

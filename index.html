@@ -7,128 +7,43 @@
 	<link rel="stylesheet" href="css/ui.css">
 	<script src="angular/angular.min.js"></script>
 	<script src="angular/angular-locale_pt-br.js"></script>
+	<script src="lib/seriaGenerator/serialGenerator.js"></script>
+	<script src="lib/ui/ui.js"></script>
+	<script src="angular/angular-route.js"></script>
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-messages/1.7.9/angular-messages.js"></script>
 	<script src="js/app.js"></script>
+
 	<script src="js/controllers/listaTelefonicaController.js"></script>
+	<script src="js/controllers/novoContatoCtrl.js"></script>
+	<script src="js/controllers/detalhesContatoCtrl.js"></script>
+
 	<script src="js/services/contatosAPIService.js"></script>
 	<script src="js/services/operadorasAPIService.js"></script>
-	<script src="js/services/serialGeneratorService.js"></script>
 	<script src="js/value/configValue.js"></script>
+
 	<script src="js/config/serialGeneratorConfig.js"></script>
+	<script src="js/config/routeConfig.js"></script>
+	<script src="js/config/interceptorsConfig.js"></script>
+
 	<script src="js/filters/nameFilter.js"></script>
 	<script src="js/filters/ellipsesFilter.js"></script>
+
 	<script src="js/directives/uiAlertDirective.js"></script>
 	<script src="js/directives/uiDateDirective.js"></script>
-	<script src="js/directives//uiAccordionDirective.js"></script>
+
+	<script src="js/interceptors/timestampInterceptor.js"></script>
+	<script src="js/interceptors/errorInterceptor.js"></script>
+	<script src="js/interceptors/loadingInterceptor.js"></script>
+	
 </head>
-<body ng-controller="listaTelefonicaCtrl">
-	<div class="jumbotron">
-		<h3>{{app}}</h3>
-
-		<!-- <ui-alert title="Ops, aconteceu um problema">
-			{{message}}
-		</ui-alert> -->
-
-		<ui-accordions>
-			<ui-accordion title="Accordion 1">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi blandit, metus vitae varius accumsan, metus urna fermentum velit, ultrices dictum purus lacus ac neque. Nam egestas at eros ut consequat. Cras bibendum eros a luctus sollicitudin. Etiam neque elit, ultricies ut commodo quis, tempus nec massa. Nunc sodales vestibulum nulla, a aliquet nibh. 
-			</ui-accordion>
-	
-			<ui-accordion title="Accordion 2">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi blandit, metus vitae varius accumsan, metus urna fermentum velit, ultrices dictum purus lacus ac neque. Nam egestas at eros ut consequat. Cras bibendum eros a luctus sollicitudin. Etiam neque elit, ultricies ut commodo quis, tempus nec massa. Nunc sodales vestibulum nulla, a aliquet nibh. 
-			</ui-accordion>
-			
-		</ui-accordions>
-		
-		<hr>
-
-		<input class="form-control" type="text" ng-model="criterioDeBusca" placeholder="O que vamos buscar?">
-		<table class="table" ng-show="contatos.length">
-			<tr>
-				<th></th>
-				<th><a href="" ng-click="ordernarPor('serial')">Serial</a></th>
-				<th><a href="" ng-click="ordernarPor('nome')">Nome</a></th>
-				<th><a href="" ng-click="ordernarPor('nome')">Telefone</a></th>
-				<th>Operadora</th>
-				<th>Data</th>
-			</tr>
-			<tr ng-class="{'selecionado negrito': contato.selecionado}" ng-repeat="contato in contatos  | filter:{ nome: criterioDeBusca} | orderBy:criterioDeOrdenacao :direcaoDaOrdenacao ">
-				<td><input type="checkbox" ng-model="contato.selecionado"></td>
-				<td>{{ contato.serial }}</td>
-				<td>{{ contato.nome | name | ellipsis:10}}</td>
-				<td>{{ contato.telefone}}</td>
-				<td>{{ contato.operadora.nome | lowercase}}</td>
-				<td>{{ contato.data | date:'dd/MM/yyyy HH:mm'}}</td>
-			</tr>
-		</table>
-		<hr>
-		
-		<form name="contatoForm">
-			<input 
-				class="form-control" 
-				type="text" 
-				ng-model="contato.nome" 
-				placeholder="Nome"
-				name="nome"
-				ng-minlength="10"
-				ng-required="true">
-
-			<input 
-				class="form-control" 
-				type="text" 
-				ng-model="contato.telefone" 
-				name="telefone"
-				placeholder="Telefone"
-				ng-required="true"
-				ng-pattern="/^\d{4,5}-\d{4}$/">
-
-			<input
-				class="form-control"
-				type="text"
-				ng-model="contato.data"
-				name="data"
-				placeholder="Data"
-				ui-date/>
-
-
-			<select 
-				class="form-control" 
-				ng-model="contato.operadora" 
-				ng-options="operadora.nome + ' ('+ (operadora.preco | currency) +') ' for operadora in operadoras | orderBy:'nome'">
-				<option value="">Selecione uma operadora</option>
-			</select>
-		</form>
-
-		<div ng-show="contatoForm.nome.$dirty" ng-messages="contatoForm.nome.$error" class="alert alert-danger">
-			<div ng-message="minlength" >
-				O Campo nome deve ter 10 caracteres
-			</div>
-			<div ng-message="required">
-				Por favor, preencher o nome
-			</div>
-		</div>
-	
-
-		<div ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty" class="alert alert-danger">
-			Por favor, preencher o telefone
-		</div>
-		<div ng-show="contatoForm.telefone.$error.pattern" class="alert alert-danger">
-			O campo telefone deve ter o formato DDDD-DDDD
-		</div>
-
-		<button 
-			class="btn btn-primary btn-block"
-			ng-click="adicionarContato(contato)" 
-			ng-disabled="contatoForm.$invalid">
-			Adicionar Contato
-		</button>
-		<button 
-			class="btn btn-danger btn-block"
-			ng-click="apagarContatos(contatos)"
-			ng-if="isContatoSelecionado(contatos)">
-			Apagar Contato
-		</button>
+<body>
+	<div ng-show="loading" class="jumbotron">
+		<h5>Carregando...</h5>
 	</div>
-	<!-- <div ng-include="'footer.html'"></div> -->
+	<div ng-hide="loading">
+		<div ng-view></div>
+		<div ng-include="'view/footer.html'"></div>
+	</div>
 </body>
 </html>
